@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SQL Injection Prevention Examples</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 20px;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        h1 {
+            color: #444;
+        }
+        pre {
+            background-color: #2e2e2e;
+            color: #f5f5f5;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        code {
+            font-family: Consolas, monospace;
+            font-size: 1.1em;
+        }
+        .example {
+            margin-bottom: 40px;
+        }
+        .example h2 {
+            color: #1a73e8;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>SQL Injection Prevention Examples</h1>
+
+    <div class="example">
+        <h2>C# - Prepared Statements (Parameterized Queries)</h2>
+        <pre><code>
+using System;
+using System.Data.SqlClient;
+
+public class Program
+{
+    public static void Main()
+    {
+        string connectionString = "your_connection_string";
+        string username = "exampleUser";
+        
+        using (SqlConnection conn = new SqlConnection(connectionString))
+        {
+            conn.Open();
+            
+            string query = "SELECT * FROM users WHERE username = @username";
+            using (SqlCommand cmd = new SqlCommand(query, conn))
+            {
+                cmd.Parameters.AddWithValue("@username", username);
+                SqlDataReader reader = cmd.ExecuteReader();
+                
+                while (reader.Read())
+                {
+                    Console.WriteLine(reader["username"]);
+                }
+            }
+        }
+    }
+}
+        </code></pre>
+    </div>
+
+    <div class="example">
+        <h2>Java - Prepared Statements (Parameterized Queries)</h2>
+        <pre><code>
+import java.sql.*;
+
+public class Main {
+    public static void main(String[] args) {
+        String connectionString = "jdbc:mysql://localhost:3306/your_database";
+        String username = "exampleUser";
+        
+        try (Connection conn = DriverManager.getConnection(connectionString, "your_user", "your_password")) {
+            String query = "SELECT * FROM users WHERE username = ?";
+            try (PreparedStatement stmt = conn.prepareStatement(query)) {
+                stmt.setString(1, username);
+                
+                ResultSet rs = stmt.executeQuery();
+                while (rs.next()) {
+                    System.out.println(rs.getString("username"));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+}
+        </code></pre>
+    </div>
+
+    <div class="example">
+        <h2>Python - Prepared Statements (Parameterized Queries)</h2>
+        <pre><code>
+import mysql.connector
+
+connection = mysql.connector.connect(
+    host="localhost", 
+    user="your_user", 
+    password="your_password", 
+    database="your_database"
+)
+
+cursor = connection.cursor()
+
+username = "exampleUser"
+query = "SELECT * FROM users WHERE username = %s"
+cursor.execute(query, (username,))
+
+for row in cursor.fetchall():
+    print(row)
+
+cursor.close()
+connection.close()
+        </code></pre>
+    </div>
+
+    <div class="example">
+        <h2>C# - Calling Stored Procedures</h2>
+        <pre><code>
+using System;
+using System.Data.SqlClient;
+
+public class Program
+{
+    public static void Main()
+    {
+        string connectionString = "your_connection_string";
+        string username = "exampleUser";
+        
+        using (SqlConnection conn = new SqlConnection(connectionString))
+        {
+            conn.Open();
+            
+            using (SqlCommand cmd = new SqlCommand("GetUserByUsername", conn))
+            {
+                cmd.CommandType = System.Data.CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@username", username);
+                
+                SqlDataReader reader = cmd.ExecuteReader();
+                
+                while (reader.Read())
+                {
+                    Console.WriteLine(reader["username"]);
+                }
+            }
+        }
+    }
+}
+        </code></pre>
+    </div>
+
+    <div class="example">
+        <h2>Java - Calling Stored Procedures</h2>
+        <pre><code>
+import java.sql.*;
+
+public class Main {
+    public static void main(String[] args) {
+        String connectionString = "jdbc:mysql://localhost:3306/your_database";
+        String username = "exampleUser";
+        
+        try (Connection conn = DriverManager.getConnection(connectionString, "your_user", "your_password")) {
+            CallableStatement stmt = conn.prepareCall("{call GetUserByUsername(?)}");
+            stmt.setString(1, username);
+            
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                System.out.println(rs.getString("username"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+}
+        </code></pre>
+    </div>
+
+    <div class="example">
+        <h2>Python - Calling Stored Procedures</h2>
+        <pre><code>
+import mysql.connector
+
+connection = mysql.connector.connect(
+    host="localhost", 
+    user="your_user", 
+    password="your_password", 
+    database="your_database"
+)
+
+cursor = connection.cursor()
+
+username = "exampleUser"
+cursor.callproc("GetUserByUsername", [username])
+
+for result in cursor.stored_results():
+    for row in result.fetchall():
+        print(row)
+
+cursor.close()
+connection.close()
+        </code></pre>
+    </div>
+
+    <div class="example">
+        <h2>C# - Sanitizing Email Input</h2>
+        <pre><code>
+using System;
+using System.Text.RegularExpressions;
+
+public class Program
+{
+    public static void Main()
+    {
+        string email = "user@example.com";
+        if (IsValidEmail(email))
+        {
+            Console.WriteLine("Valid email address.");
+        }
+        else
+        {
+            Console.WriteLine("Invalid email address.");
+        }
+    }
+
+    public static bool IsValidEmail(string email)
+    {
+        string pattern = @"^[^@]+@[^@]+\.[^@]+$";
+        return Regex.IsMatch(email, pattern);
+    }
+}
+        </code></pre>
+    </div>
+
+    <div class="example">
+        <h2>Java - Sanitizing Email Input</h2>
+        <pre><code>
+import java.util.regex.*;
+
+public class Main {
+    public static void main(String[] args) {
+        String email = "user@example.com";
+        if (isValidEmail(email)) {
+            System.out.println("Valid email address.");
+        } else {
+            System.out.println("Invalid email address.");
+        }
+    }
+
+    public static boolean isValidEmail(String email) {
+        String pattern = "^[^@]+@[^@]+\\.[^@]+$";
+        return email.matches(pattern);
+    }
+}
+        </code></pre>
+    </div>
+
+    <div class="example">
+        <h2>Python - Sanitizing Email Input</h2>
+        <pre><code>
+import re
+
+def is_valid_email(email):
+    pattern = r"^[^@]+@[^@]+\.[^@]+$"
+    return re.match(pattern, email) is not None
+
+email = "user@example.com"
+if is_valid_email(email):
+    print("Valid email address.")
+else:
+    print("Invalid email address.")
+        </code></pre>
+    </div>
+
+    <div class="example">
+        <h2>C# - Error Handling</h2>
+        <pre><code>
+try
+{
+    // Your database code here
+}
+catch (SqlException ex)
+{
+    Console.WriteLine("An error occurred. Please try again later.");
+    // Log the full error message for debugging internally
+}
+        </code></pre>
+    </div>
+
+    <div class="example">
+        <h2>Java - Error Handling</h2>
+        <pre><code>
+try {
+    // Your database code here
+} catch (SQLException ex) {
+    System.out.println("An error occurred. Please try again later.");
+    // Log the full error message for debugging internally
+}
+        </code></pre>
+    </div>
+
+    <div class="example">
+        <h2>Python - Error Handling</h2>
+        <pre><code>
+try:
+    # Your database code here
+except mysql.connector.Error as err:
+    print("An error occurred. Please try again later.")
+    # Log the full error message for debugging internally
+        </code></pre>
+    </div>
+
+</body>
+</html>
